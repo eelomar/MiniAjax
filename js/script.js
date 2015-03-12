@@ -15,7 +15,7 @@ function loadData() {
     //load values of streee and city
     var streetValue=$('#street').val();
     var cityValue=$('#city').val();
-    $greeting.text('So you want to live at '+streetValue+' , '+cityValue+'?');
+    $greeting.text('So, you want to live at '+streetValue+' , '+cityValue+'?');
     console.log(streetValue +'--> '+cityValue);
     //load values of windows width and height
     var sizeValue=$(window).width()+'x'+$( window ).height();

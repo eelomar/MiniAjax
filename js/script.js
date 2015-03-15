@@ -3,6 +3,7 @@ function loadData() {
 
     var $body = $('body');
     var $wikiElem = $('#wikipedia-links');
+    var $wikiHeader=$('#wikipedia-header');
     var $nytHeaderElem = $('#nytimes-header');
     var $nytElem = $('#nytimes-articles');
     var $greeting = $('#greeting');
@@ -27,28 +28,49 @@ function loadData() {
     $body.append(source);
 //NY articles
 
-var present='<ul id="nytimes-articles" class="article-list"></ul>';//inside this
 var nyURL='http://api.nytimes.com/svc/search/v2/articlesearch.json?q='+cityValue+'&sort=newest&page=0&api-key=54f39ef6e0fa68ff5f62ce0249a1a637:10:71578692';
 
 
 $.getJSON( nyURL, function( data ) {
       //  console.log(data);
-  var items = [];
-  $nytHeaderElem.text('New York articles about '+ cityValue);
-console.log(data.response);
-  $.each( data.response.docs,function(key,value) {
+      var items = [];
+      $nytHeaderElem.text('New York articles about '+ cityValue);
+     // console.log(data.response);
+     $.each( data.response.docs,function(key,value) {
     //console.log(key+'....'+value);
-      var refurl=value.web_url;
-      var refText=value.headline.main;
-      var paraText=value.snippet;
+    var refurl=value.web_url;
+    var refText=value.headline.main;
+    var paraText=value.snippet;
     items.push( '<li class="article"><a href="'+refurl+ '">'+refText+'</a><p>'+paraText +' </p></li>');
 });
-  var UnList='<ul id="nytimes-articles" class="article-list">'+items.join( "" )+'</ul>';
-$nytElem.append(UnList);
+     var UnList='<ul id="nytimes-articles" class="article-list">'+items.join( "" )+'</ul>';
+     $nytElem.append(UnList);
 
-}).error(function() {
-   $nytHeaderElem.text('New York articles could not be loaded');
-  });
+ }).error(function() {
+     $nytHeaderElem.text('New York articles could not be loaded');
+ });
+//wikipedia articles
+//error handling 8 secons
+var wikiRequestTimeout=setTimeout(function(){ $wikiHeader.text('Wikipedia articles could not be loaded');
+},8000);
+
+var wikURL='http://en.wikipedia.org/w/api.php?format=json&action=opensearch&search='+cityValue;//+'&callback=?'//+'&callback=wikiCallback'
+$.ajax({
+    url:wikURL,
+    dataType: "jsonp",
+    success: function (data) {
+      //  console.log(data);
+        var names=data[1];
+        var links=data[3];
+        for (var i=0;i<names.length;i++){
+            var artLin='<li><a href="'+links[i]+'">'+names[i]+' </a></li>';
+            $wikiElem.append(artLin);
+        }
+        //stop timeour if succesfull
+        clearTimeout(wikiRequestTimeout);
+    }
+});
+
 return false;
 };
 
